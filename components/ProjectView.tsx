@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Project, ProjectBriefState, StructuredState, Update } from '../types';
 import { processUpdate, generateProjectBrief, generateTags, detectRiskAlerts } from '../services/geminiService';
-import { supabase } from '../services/supabaseClient';
 import UpdateInput from './UpdateInput';
 import Icon from './icons';
 import ProjectBrief from './ProjectBrief';
@@ -16,10 +15,12 @@ interface ProjectViewProps {
     project: Project;
     updateProject: (projectId: string, updater: (project: Project) => Project) => void;
     addProjectUpdate: (projectId: string, payload: { text: string; structuredState: StructuredState | null; tags?: string[] }) => Promise<Update>;
+    deleteProject: (projectId: string) => Promise<void>;
+    deleteProjectUpdate: (projectId: string, updateId: string) => Promise<void>;
     setActiveProjectId: (id: string | null) => void;
 }
 
-const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addProjectUpdate, setActiveProjectId }) => {
+const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addProjectUpdate, deleteProject, deleteProjectUpdate, setActiveProjectId }) => {
     const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'state' | 'brief' | 'timeline'>('overview');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -84,45 +85,31 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
     }, [project.id, updateProject]);
 
     const handleDeleteUpdate = useCallback(async (updateId: string) => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}/api/projects/${project.id}/updates/${updateId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-                },
-            });
-            
-            if (!response.ok) throw new Error('Failed to delete update');
-            
-            // Refresh project data
-            window.location.reload();
-        } catch (error) {
-            console.error('Error deleting update:', error);
-            alert('Failed to delete update. Please try again.');
+        if (!updateId) {
+            return;
         }
-    }, [project.id]);
+
+        try {
+            await deleteProjectUpdate(project.id, updateId);
+        } catch (err) {
+            console.error('Error deleting update:', err);
+            setError('Failed to delete update. Please try again.');
+        }
+    }, [deleteProjectUpdate, project.id]);
 
     const handleDeleteProject = useCallback(async () => {
         if (!confirm(`Delete "${project.name}"? This cannot be undone.`)) {
             return;
         }
-        
+
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}/api/projects/${project.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-                },
-            });
-            
-            if (!response.ok) throw new Error('Failed to delete project');
-            
-            setActiveProjectId(null); // Go back to dashboard
-        } catch (error) {
-            console.error('Error deleting project:', error);
-            alert('Failed to delete project. Please try again.');
+            await deleteProject(project.id);
+            setActiveProjectId(null);
+        } catch (err) {
+            console.error('Error deleting project:', err);
+            setError('Failed to delete project. Please try again.');
         }
-    }, [project.id, project.name, setActiveProjectId]);
+    }, [deleteProject, project.id, project.name, setActiveProjectId]);
 
     const exportToMarkdown = useCallback(() => {
         const lines: string[] = [];

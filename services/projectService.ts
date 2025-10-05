@@ -90,4 +90,8 @@ export const projectService = {
   async deleteProject(projectId: string): Promise<void> {
     await apiClient.delete(`/api/projects/${projectId}`);
   },
+
+  async deleteUpdate(projectId: string, updateId: string): Promise<void> {
+    await apiClient.delete(`/api/projects/${projectId}/updates/${updateId}`);
+  },
 };

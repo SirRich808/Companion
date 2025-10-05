@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const LoginPage: React.FC = () => {
-  const { signInWithGoogle, signInWithMagicLink, loading } = useAuth();
+  const { signInWithGoogle, signInWithMagicLink, loading, error, clearError } = useAuth();
   const [signingIn, setSigningIn] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [magicLinkSent, setMagicLinkSent] = React.useState(false);
@@ -14,7 +14,6 @@ export const LoginPage: React.FC = () => {
       await signInWithGoogle();
     } catch (error) {
       console.error('Sign in failed:', error);
-      alert('Failed to sign in with Google. Please try again.');
       setSigningIn(false);
     }
   };
@@ -29,7 +28,6 @@ export const LoginPage: React.FC = () => {
       setMagicLinkSent(true);
     } catch (error) {
       console.error('Magic link failed:', error);
-      alert('Failed to send magic link. Please try again.');
       setSendingMagicLink(false);
     }
   };
@@ -62,6 +60,28 @@ export const LoginPage: React.FC = () => {
             <h2 className="text-2xl font-semibold text-white mb-2">Welcome back!</h2>
             <p className="text-purple-200">Sign in to manage your projects</p>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-red-200 text-sm">{error}</span>
+                </div>
+                <button
+                  onClick={clearError}
+                  className="text-red-300 hover:text-red-100 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
 
           {magicLinkSent ? (
             /* Success Message */

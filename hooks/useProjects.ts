@@ -143,6 +143,32 @@ export const useProjects = () => {
     []
   );
 
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      await projectService.deleteProject(projectId);
+      setProjects(prev => prev.filter(project => project.id !== projectId));
+      setActiveProjectIdState(prev => (prev === projectId ? null : prev));
+    },
+    []
+  );
+
+  const deleteProjectUpdate = useCallback(
+    async (projectId: string, updateId: string) => {
+      await projectService.deleteUpdate(projectId, updateId);
+      setProjects(prev =>
+        prev.map(project =>
+          project.id === projectId
+            ? {
+                ...project,
+                updates: project.updates.filter(update => update.id !== updateId),
+              }
+            : project
+        )
+      );
+    },
+    []
+  );
+
   const activeProject = useMemo(
     () => projects.find(project => project.id === activeProjectId) ?? null,
     [projects, activeProjectId]
@@ -160,6 +186,8 @@ export const useProjects = () => {
     updateProjectMeta,
     refreshProject,
     mutateProject,
+    deleteProject,
+    deleteProjectUpdate,
     reloadProjects: fetchProjects,
   } as const;
 };

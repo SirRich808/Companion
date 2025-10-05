@@ -19,6 +19,8 @@ function AppContent() {
         createProject,
         addProjectUpdate,
         mutateProject,
+        deleteProject,
+        deleteProjectUpdate,
     } = useProjects();
 
     const handleAddProject = useCallback(async ({ name, goal, documentContent }: ProjectCreationInput) => {
@@ -70,6 +72,8 @@ function AppContent() {
                     project={activeProject}
                     updateProject={mutateProject}
                     addProjectUpdate={addProjectUpdate}
+                    deleteProject={deleteProject}
+                    deleteProjectUpdate={deleteProjectUpdate}
                     setActiveProjectId={setActiveProjectId}
                 />
                 <AILoadingOverlay isVisible={isAIProcessing} />
