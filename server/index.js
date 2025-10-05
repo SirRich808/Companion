@@ -13,6 +13,7 @@ import {
   updateProjectMeta,
   deleteProject,
 } from './projectRepository.js';
+import * as geminiService from './geminiService.js';
 
 dotenv.config({ path: '.env.local' });
 if (!process.env.SUPABASE_DB_URL) {
@@ -153,6 +154,71 @@ app.delete('/api/projects/:projectId', async (req, res) => {
   } catch (error) {
     console.error('Failed to delete project', error);
     res.status(500).json({ message: 'Unable to delete project' });
+  }
+});
+
+// AI Processing Endpoints
+app.post('/api/ai/process-update', async (req, res) => {
+  const { updateText, project } = req.body;
+  
+  if (!updateText || !project) {
+    return res.status(400).json({ message: 'updateText and project are required' });
+  }
+
+  try {
+    const structuredState = await geminiService.processUpdate(updateText, project);
+    res.json({ structuredState });
+  } catch (error) {
+    console.error('AI processing failed:', error);
+    res.status(500).json({ message: 'Failed to process update with AI' });
+  }
+});
+
+app.post('/api/ai/generate-brief', async (req, res) => {
+  const { project } = req.body;
+  
+  if (!project) {
+    return res.status(400).json({ message: 'project is required' });
+  }
+
+  try {
+    const brief = await geminiService.generateProjectBrief(project);
+    res.json({ brief });
+  } catch (error) {
+    console.error('Brief generation failed:', error);
+    res.status(500).json({ message: 'Failed to generate project brief' });
+  }
+});
+
+app.post('/api/ai/generate-tags', async (req, res) => {
+  const { updateText } = req.body;
+  
+  if (!updateText) {
+    return res.status(400).json({ message: 'updateText is required' });
+  }
+
+  try {
+    const tags = await geminiService.generateTags(updateText);
+    res.json({ tags });
+  } catch (error) {
+    console.error('Tag generation failed:', error);
+    res.status(500).json({ message: 'Failed to generate tags' });
+  }
+});
+
+app.post('/api/ai/portfolio-brief', async (req, res) => {
+  const { projects } = req.body;
+  
+  if (!projects || !Array.isArray(projects)) {
+    return res.status(400).json({ message: 'projects array is required' });
+  }
+
+  try {
+    const brief = await geminiService.generatePortfolioBrief(projects);
+    res.json({ brief });
+  } catch (error) {
+    console.error('Portfolio brief generation failed:', error);
+    res.status(500).json({ message: 'Failed to generate portfolio brief' });
   }
 });
 
