@@ -1,0 +1,66 @@
+/* Global overrides for tailwind-loaded layout */
+:root {
+    color-scheme: dark;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* AI Loading Overlay Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-100px) translateX(20px);
+        opacity: 0.3;
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.4s ease-out;
+}
+
+.animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+}
+
+.animate-float {
+    animation: float linear infinite;
+}
