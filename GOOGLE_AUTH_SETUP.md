@@ -5,7 +5,7 @@ Follow these steps to enable Google authentication for your Project Companion ap
 ## Step 1: Configure Google OAuth in Supabase
 
 1. **Go to your Supabase Dashboard**
-   - Visit: https://supabase.com/dashboard/project/cldiiacmajhbdlwgbfzn
+   - Visit: https://supabase.com/dashboard/project/<your-project-ref>
    - Navigate to: **Authentication** → **Providers**
 
 2. **Enable Google Provider**
@@ -26,7 +26,7 @@ Follow these steps to enable Google authentication for your Project Companion ap
    - Add authorized domains: `supabase.co`
 
 5. **Configure Authorized redirect URIs**:
-   - Add: `https://cldiiacmajhbdlwgbfzn.supabase.co/auth/v1/callback`
+   - Add: `https://<your-project-ref>.supabase.co/auth/v1/callback`
    
 6. **Copy credentials to Supabase**:
    - Copy the **Client ID** from Google Cloud Console
@@ -38,7 +38,7 @@ Follow these steps to enable Google authentication for your Project Companion ap
 
 1. In Google Cloud Console OAuth credentials:
    - Add to **Authorized JavaScript origins**: `http://localhost:3000`
-   - Add to **Authorized redirect URIs**: `https://cldiiacmajhbdlwgbfzn.supabase.co/auth/v1/callback`
+   - Add to **Authorized redirect URIs**: `https://<your-project-ref>.supabase.co/auth/v1/callback`
 
 ## Step 3: Test Authentication
 

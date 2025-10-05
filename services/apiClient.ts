@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { supabase, supabaseClientError } from './supabaseClient';
 
 const resolveBaseUrl = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
@@ -22,6 +22,13 @@ const buildUrl = (path: string) => {
 };
 
 const getAuthHeaders = async () => {
+  if (!supabase) {
+    if (supabaseClientError) {
+      console.warn('Supabase auth unavailable:', supabaseClientError.message);
+    }
+    return {};
+  }
+
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.access_token) {
     return { Authorization: `Bearer ${session.access_token}` };

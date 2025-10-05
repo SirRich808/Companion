@@ -17,7 +17,7 @@
 npx supabase login
 
 # Link to your project
-npx supabase link --project-ref cldiiacmajhbdlwgbfzn
+npx supabase link --project-ref <your-project-ref>
 
 # Set your Gemini API key as a secret
 npx supabase secrets set GEMINI_API_KEY=your_gemini_api_key_here
@@ -41,7 +41,7 @@ const API_BASE_URL = import.meta.env.VITE_SUPABASE_URL + '/functions/v1';
 
 **Netlify (Frontend):**
 ```
-VITE_SUPABASE_URL=https://cldiiacmajhbdlwgbfzn.supabase.co
+VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 

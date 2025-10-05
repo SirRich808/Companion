@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../services/supabaseClient';
+import { supabase, supabaseClientError, getSupabaseClient } from '../services/supabaseClient';
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +28,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let active = true;
+
+    if (!supabase) {
+      setError(supabaseClientError?.message ?? 'Supabase is not configured.');
+      setLoading(false);
+      return () => {
+        active = false;
+      };
+    }
 
     const initialiseSession = async () => {
       try {
@@ -79,6 +87,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const runAuthAction = async (action: () => Promise<void>, fallback: string) => {
     clearError();
+    if (!supabase) {
+      const message = supabaseClientError?.message ?? 'Supabase is not configured.';
+      setError(message);
+      throw new Error(message);
+    }
     try {
       await action();
     } catch (authError) {
@@ -90,7 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = () =>
     runAuthAction(async () => {
-      const { error: authError } = await supabase.auth.signInWithOAuth({
+      const client = getSupabaseClient();
+      const { error: authError } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: window.location.origin },
       });
@@ -106,7 +120,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Please provide a valid email address');
       }
 
-      const { error: authError } = await supabase.auth.signInWithOtp({
+      const client = getSupabaseClient();
+      const { error: authError } = await client.auth.signInWithOtp({
         email,
         options: { emailRedirectTo: window.location.origin },
       });
@@ -118,7 +133,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = () =>
     runAuthAction(async () => {
-      const { error: authError } = await supabase.auth.signOut();
+      const client = getSupabaseClient();
+      const { error: authError } = await client.auth.signOut();
       if (authError) {
         throw authError;
       }

@@ -1,7 +1,8 @@
 import { Project, StructuredState, ProjectBriefState, RiskAlert, PortfolioBriefState, TaskItem } from '../types';
-import { supabase } from './supabaseClient';
+import { getSupabaseClient } from './supabaseClient';
 
 const invokeEdgeFunction = async <TPayload, TResult>(name: string, payload: TPayload): Promise<TResult> => {
+  const supabase = getSupabaseClient();
   const { data, error } = await supabase.functions.invoke<TResult>(name, {
     body: payload,
   });
