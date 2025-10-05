@@ -9,6 +9,7 @@ import ProjectTimeline from './ProjectTimeline';
 import TaskExportModal from './TaskExportModal';
 import ShareModal from './ShareModal';
 import ProjectOverview from './ProjectOverview';
+import AllTasksView from './AllTasksView';
 
 interface ProjectViewProps {
     project: Project;
@@ -18,7 +19,7 @@ interface ProjectViewProps {
 }
 
 const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addProjectUpdate, setActiveProjectId }) => {
-    const [activeTab, setActiveTab] = useState<'overview' | 'state' | 'brief' | 'timeline'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'state' | 'brief' | 'timeline'>('overview');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -144,6 +145,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
             <div className="border-b border-slate-700 px-4 sm:px-6">
                 <nav className="flex space-x-4 overflow-x-auto">
                     <button onClick={() => setActiveTab('overview')} className={`py-3 px-1 font-medium whitespace-nowrap ${activeTab === 'overview' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-white'}`}>Overview</button>
+                    <button onClick={() => setActiveTab('tasks')} className={`py-3 px-1 font-medium whitespace-nowrap ${activeTab === 'tasks' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-white'}`}>All Tasks</button>
                     <button onClick={() => setActiveTab('state')} className={`py-3 px-1 font-medium whitespace-nowrap ${activeTab === 'state' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-white'}`}>Living Document</button>
                     <button onClick={() => setActiveTab('brief')} className={`py-3 px-1 font-medium whitespace-nowrap ${activeTab === 'brief' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-white'}`}>Project Brief</button>
                     <button onClick={() => setActiveTab('timeline')} className={`py-3 px-1 font-medium whitespace-nowrap ${activeTab === 'timeline' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-slate-400 hover:text-white'}`}>Timeline</button>
@@ -156,6 +158,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
                 {/* Overview Tab */}
                 <div className={activeTab === 'overview' ? 'block' : 'hidden'}>
                     <ProjectOverview project={project} />
+                </div>
+
+                {/* All Tasks Tab */}
+                <div className={activeTab === 'tasks' ? 'block' : 'hidden'}>
+                    <AllTasksView project={project} />
                 </div>
                 
                 {/* Risk Alerts */}
@@ -208,7 +215,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
                 </div>
             </main>
 
-            <div className={activeTab === 'brief' ? 'hidden' : 'block'}>
+            <div className={activeTab === 'brief' || activeTab === 'tasks' ? 'hidden' : 'block'}>
               <UpdateInput onUpdate={handleUpdate} isLoading={isLoading} currentState={project.currentState} />
             </div>
             
