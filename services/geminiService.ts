@@ -1,32 +1,33 @@
-// Frontend AI Service - All AI processing is done on the backend for security
-// This service makes API calls to the backend which handles Gemini API
+// Frontend AI Service - All AI processing via Supabase Edge Functions
 import { Project, StructuredState, ProjectBriefState, RiskAlert, PortfolioBriefState, TaskItem } from '../types';
-import { apiClient } from './apiClient';
+import { supabase } from './supabaseClient';
 
-// Process update via backend API
+// Process update via Supabase Edge Function
 export const processUpdate = async (updateText: string, project: Project): Promise<StructuredState> => {
     console.log("Processing update for project:", project.name);
     
     try {
-        const response = await apiClient.post<{ structuredState: StructuredState }>(
-            '/api/ai/process-update',
-            { updateText, project }
-        );
-        return response.structuredState;
+        const { data, error } = await supabase.functions.invoke('process-update', {
+            body: { updateText, project }
+        });
+        
+        if (error) throw error;
+        return data.structuredState;
     } catch (error) {
         console.error("Error processing update:", error);
         throw new Error("Failed to process update. Please try again.");
     }
 };
 
-// Generate tags via backend API
+// Generate tags via Supabase Edge Function
 export const generateTags = async (updateText: string): Promise<string[]> => {
     try {
-        const response = await apiClient.post<{ tags: string[] }>(
-            '/api/ai/generate-tags',
-            { updateText }
-        );
-        return response.tags;
+        const { data, error } = await supabase.functions.invoke('generate-tags', {
+            body: { updateText }
+        });
+        
+        if (error) throw error;
+        return data.tags || [];
     } catch (error) {
         console.error("Failed to generate tags:", error);
         return [];
@@ -89,32 +90,34 @@ export const detectRiskAlerts = (previousState: StructuredState | null | undefin
     return alerts;
 };
 
-// Generate project brief via backend API
+// Generate project brief via Supabase Edge Function
 export const generateProjectBrief = async (project: Project): Promise<ProjectBriefState> => {
     console.log("Generating project brief for:", project.name);
     
     try {
-        const response = await apiClient.post<{ brief: ProjectBriefState }>(
-            '/api/ai/generate-brief',
-            { project }
-        );
-        return response.brief;
+        const { data, error } = await supabase.functions.invoke('generate-brief', {
+            body: { project }
+        });
+        
+        if (error) throw error;
+        return data.brief;
     } catch (error) {
         console.error("Error generating project brief:", error);
         throw new Error("Failed to generate project brief.");
     }
 };
 
-// Generate portfolio brief via backend API
+// Generate portfolio brief via Supabase Edge Function
 export const generatePortfolioBrief = async (projects: Project[]): Promise<PortfolioBriefState> => {
     console.log("Generating portfolio brief for", projects.length, "projects");
     
     try {
-        const response = await apiClient.post<{ brief: PortfolioBriefState }>(
-            '/api/ai/portfolio-brief',
-            { projects }
-        );
-        return response.brief;
+        const { data, error } = await supabase.functions.invoke('portfolio-brief', {
+            body: { projects }
+        });
+        
+        if (error) throw error;
+        return data.brief;
     } catch (error) {
         console.error("Error generating portfolio brief:", error);
         throw new Error("Failed to generate portfolio brief.");

@@ -1,0 +1,44 @@
+
+[functions.process-update]
+enabled = true
+verify_jwt = true
+import_map = "./functions/process-update/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/process-update/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/process-update/*.html" ]
+
+[functions.generate-brief]
+enabled = true
+verify_jwt = true
+import_map = "./functions/generate-brief/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/generate-brief/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/generate-brief/*.html" ]
+
+[functions.generate-tags]
+enabled = true
+verify_jwt = true
+import_map = "./functions/generate-tags/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/generate-tags/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/generate-tags/*.html" ]
+
+[functions.portfolio-brief]
+enabled = true
+verify_jwt = true
+import_map = "./functions/portfolio-brief/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/portfolio-brief/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/portfolio-brief/*.html" ]

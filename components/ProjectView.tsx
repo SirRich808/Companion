@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Project, ProjectBriefState, StructuredState, Update } from '../types';
 import { processUpdate, generateProjectBrief, generateTags, detectRiskAlerts } from '../services/geminiService';
+import { supabase } from '../services/supabaseClient';
 import UpdateInput from './UpdateInput';
 import Icon from './icons';
 import ProjectBrief from './ProjectBrief';
@@ -82,6 +83,47 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
         }));
     }, [project.id, updateProject]);
 
+    const handleDeleteUpdate = useCallback(async (updateId: string) => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}/api/projects/${project.id}/updates/${updateId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+                },
+            });
+            
+            if (!response.ok) throw new Error('Failed to delete update');
+            
+            // Refresh project data
+            window.location.reload();
+        } catch (error) {
+            console.error('Error deleting update:', error);
+            alert('Failed to delete update. Please try again.');
+        }
+    }, [project.id]);
+
+    const handleDeleteProject = useCallback(async () => {
+        if (!confirm(`Delete "${project.name}"? This cannot be undone.`)) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}/api/projects/${project.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+                },
+            });
+            
+            if (!response.ok) throw new Error('Failed to delete project');
+            
+            setActiveProjectId(null); // Go back to dashboard
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            alert('Failed to delete project. Please try again.');
+        }
+    }, [project.id, project.name, setActiveProjectId]);
+
     const exportToMarkdown = useCallback(() => {
         const lines: string[] = [];
         lines.push(`# Project: ${project.name}`, '');
@@ -139,6 +181,9 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
                 </button>
                 <button onClick={exportToMarkdown} className="p-2 rounded-full hover:bg-slate-700" title="Export to Markdown">
                     <Icon name="download" className="w-6 h-6" />
+                </button>
+                <button onClick={handleDeleteProject} className="p-2 rounded-full hover:bg-red-700 text-red-400 hover:text-red-300" title="Delete Project">
+                    <Icon name="trash" className="w-6 h-6" />
                 </button>
             </header>
 
@@ -211,7 +256,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({ project, updateProject, addPr
                     />
                 </div>
                 <div className={activeTab === 'timeline' ? 'block' : 'hidden'}>
-                    <ProjectTimeline updates={project.updates} />
+                    <ProjectTimeline updates={project.updates} onDeleteUpdate={handleDeleteUpdate} />
                 </div>
             </main>
 

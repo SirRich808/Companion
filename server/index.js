@@ -12,6 +12,7 @@ import {
   addProjectUpdate,
   updateProjectMeta,
   deleteProject,
+  deleteUpdate,
 } from './projectRepository.js';
 import * as geminiService from './geminiService.js';
 
@@ -154,6 +155,16 @@ app.delete('/api/projects/:projectId', async (req, res) => {
   } catch (error) {
     console.error('Failed to delete project', error);
     res.status(500).json({ message: 'Unable to delete project' });
+  }
+});
+
+app.delete('/api/projects/:projectId/updates/:updateId', async (req, res) => {
+  try {
+    await deleteUpdate(req.params.projectId, req.params.updateId);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Failed to delete update', error);
+    res.status(500).json({ message: 'Unable to delete update' });
   }
 });
 

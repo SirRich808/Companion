@@ -91,7 +91,7 @@ export const createProject = async ({ name, goal, status = 'active', initialCont
 
   const createdRow = mapProjectRow(rows[0]);
   const project = await getProjectById(createdRow.id, userId);
-  return project ?? { ...createdRow, updates: [] };
+  return project;
 };
 
 export const listProjects = async (userId = null) => {
@@ -207,4 +207,9 @@ export const updateProjectMeta = async (projectId, { name, goal, status, current
 
 export const deleteProject = async (projectId) => {
   await pool.query('delete from projects where id = $1', [projectId]);
+};
+
+export const deleteUpdate = async (projectId, updateId) => {
+  await pool.query('delete from project_updates where id = $1 and project_id = $2', [updateId, projectId]);
+  await pool.query('update projects set updated_at = timezone(\'utc\', now()) where id = $1', [projectId]);
 };

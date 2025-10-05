@@ -4,9 +4,10 @@ import Icon from './icons';
 
 interface ProjectTimelineProps {
     updates: Update[];
+    onDeleteUpdate?: (updateId: string) => void;
 }
 
-const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ updates }) => {
+const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ updates, onDeleteUpdate }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -114,7 +115,18 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({ updates }) => {
                                     </div>
                                 </div>
                                 <div className="bg-slate-800 rounded-lg p-4 border border-slate-700 flex-1">
-                                    <p className="text-slate-300 whitespace-pre-wrap mb-3">{update.text}</p>
+                                    <div className="flex justify-between items-start mb-3">
+                                        <p className="text-slate-300 whitespace-pre-wrap flex-1">{update.text}</p>
+                                        {onDeleteUpdate && (
+                                            <button
+                                                onClick={() => confirm('Delete this update?') && onDeleteUpdate(update.id)}
+                                                className="ml-3 p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-900/20 rounded transition-colors"
+                                                title="Delete update"
+                                            >
+                                                <Icon name="trash" className="w-4 h-4" />
+                                            </button>
+                                        )}
+                                    </div>
                                     {update.tags && update.tags.length > 0 && (
                                         <div className="flex flex-wrap gap-1.5 pt-2 border-t border-slate-700">
                                             {update.tags.map((tag, idx) => (
